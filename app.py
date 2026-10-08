@@ -155,19 +155,19 @@ def ask_stepora(user_message):
 
     return response.choices[0].message.content
 
+if __name__ == "__main__":
+    print("\nSTEPORA AI")
+    print("See What Counts. Know What's Next.\n")
 
-print("\nSTEPORA AI")
-print("See What Counts. Know What's Next.\n")
+    user_message = input(
+        "Tell STEPORA about your education and career goal: "
+    )
 
-user_message = input(
-    "Tell STEPORA about your education and career goal: "
-)
+    print("\nBuilding your pathway...\n")
 
-print("\nBuilding your pathway...\n")
-
-try:
-    answer = ask_stepora(user_message)
-    print(answer)
-except Exception as error:
-    print("\nSTEPORA could not generate the pathway.")
-    print("Error:", error)
+    try:
+        answer = ask_stepora(user_message)
+        print(answer)
+    except Exception as error:
+        print("\nSTEPORA could not generate the pathway.")
+        print("Error:", error)  
