@@ -26,6 +26,41 @@ STRICT ACCURACY RULES:
    Never assume coursework, clinical training, work experience,
    licenses, certifications, transcript contents, grades, or
    credentials that the user did not state.
+IMPORTANT: Never claim that a user's documents, transcripts,
+credentials, or applications are already on file with NYSED
+unless the user explicitly confirms this.
+
+Distinguish Clinical Laboratory Technologist from Clinical
+Laboratory Technician. Do not suggest that an associate's
+degree alone qualifies someone for Technologist licensure.
+
+Never call the examination the "NYSED Clinical Laboratory
+Technologist exam." Instead, refer to an examination accepted
+by NYSED, and direct users to the official requirements for
+current examination options.
+CRITICAL RULE FOR HIGH-SCHOOL-ONLY APPLICANTS:
+If the user reports high school as their highest education,
+do not suggest that the high-school diploma could be equivalent
+to a bachelor's degree.
+
+Explain that the applicant needs an appropriate post-secondary
+education pathway. Include NYSED-registered Clinical Laboratory
+Science bachelor's programs as a possible route.
+
+Never invent an examination name. Use the exact wording
+"an examination accepted by NYSED" unless the verified
+official source identifies a specific examination.
+
+Do not recommend credential evaluation for bachelor's-degree
+equivalency when the user reports only high-school education.
+
+Do not promise a preliminary credential evaluation or
+pre-approval service unless the official NYSED source
+explicitly confirms that service is available.
+
+When information is missing or cannot be verified, clearly
+state what is unknown. Never invent eligibility, program
+approval, tuition, fees, timelines, or credential acceptance.
 
 2. A degree title or major alone does NOT prove that a person
    completed particular courses.
@@ -139,6 +174,28 @@ client = OpenAI(
 )
 
 
+def validate_stepora_response(answer, user_message):
+    """Catch misleading statements before showing a pathway."""
+    text = answer.lower()
+    user_text = user_message.lower()
+
+    if "ny sed clinical laboratory technologist examination" in text or "nysed clinical laboratory technologist examination" in text:
+        return False, "The examination name needs verification."
+
+    if "high school" in user_text or "high-school" in user_text:
+        misleading = [
+            "high-school diploma is equivalent to a bachelor's degree",
+            "high-school credentials are equivalent to a bachelor's degree",
+            "residency in new york makes you eligible",
+        ]
+        if any(phrase in text for phrase in misleading):
+            return False, "The education or eligibility guidance needs correction."
+
+    return True, ""
+
+
+
+
 def ask_stepora(user_message):    
     verified_context = VERIFIED_CAREER_DATA["clinical_laboratory_technologist"]["verified_guidance"]
     verified_sources = VERIFIED_CAREER_DATA["clinical_laboratory_technologist"]["source_urls"]     
@@ -153,7 +210,18 @@ def ask_stepora(user_message):
         ],
     )
 
-    return response.choices[0].message.content
+    answer = response.choices[0].message.content
+    is_valid, reason = validate_stepora_response(answer, user_message)
+
+    if not is_valid:
+        return (
+            "STEPORA could not safely verify this pathway. "
+            + reason
+            + "\nPlease review the official NYSED requirements."
+        )
+
+    return answer
+
 
 if __name__ == "__main__":
     print("\nSTEPORA AI")
