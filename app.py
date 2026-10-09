@@ -190,6 +190,20 @@ def validate_stepora_response(answer, user_message):
         ]
         if any(phrase in text for phrase in misleading):
             return False, "The education or eligibility guidance needs correction."
+    import re
+
+    exam_score_error = re.search(
+        r"ascp\s+mls\s+exam(?:ination)?.{0,70}converted\s+(?:passing\s+)?score",
+        text,
+        re.DOTALL,
+    )
+
+    if exam_score_error:
+        return False, (
+            "The converted passing score must not be "
+            "attributed to the ASCP MLS examination."
+        )
+
 
     return True, ""
 

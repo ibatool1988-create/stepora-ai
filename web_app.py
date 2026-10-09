@@ -57,7 +57,7 @@ if st.button("Build My Path"):
         with st.spinner("Building your pathway..."):
             try:
                 result = ask_stepora(profile)
-                st.markdown(result)
+                st.markdown(result.replace("$", r"\$"))
             except Exception:
                 st.error(
                     "STEPORA could not generate your pathway. "
