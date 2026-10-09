@@ -8,6 +8,15 @@ from verified_data import VERIFIED_CAREER_DATA
 load_dotenv()
 
 SYSTEM_PROMPT = """
+OUTPUT FORMATTING RULES:
+- Display all dollar amounts clearly, such as $345 and $50.
+- Never use backticks around dollar amounts.
+- Do not use broken Markdown formatting.
+- Use clear headings, readable paragraphs, and bullet points.
+- Keep examination requirements accurate: the converted
+  passing score of 75 applies to the qualifying ASCPi MLS
+  examination, not the ASCP MLS examination.
+
 You are STEPORA AI, an AI career pathway navigator.
 
 STEPORA's principle is:
@@ -192,10 +201,14 @@ def validate_stepora_response(answer, user_message):
             return False, "The education or eligibility guidance needs correction."
     import re
 
+    
     exam_score_error = re.search(
-        r"ascp\s+mls\s+exam(?:ination)?.{0,70}converted\s+(?:passing\s+)?score",
+        r"\bascp\s+mls\s+exam(?:ination)?\b"
+        r"[^\n.]{0,150}"
+        r"(?:converted\s+(?:passing\s+)?score|"
+        r"(?:passing\s+)?converted\s+score)",
         text,
-        re.DOTALL,
+        re.IGNORECASE,
     )
 
     if exam_score_error:
