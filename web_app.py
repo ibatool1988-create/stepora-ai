@@ -144,7 +144,7 @@ with c3:
 with c4:
     st.markdown('<div class="feature"><b>📈 Plan with Confidence</b><p>Understand your next steps</p></div>', unsafe_allow_html=True)
 
-st.markdown('<div class="result-heading"><h2>Your Personalized Career Pathway</h2></div>', unsafe_allow_html=True)
+
 
 if build:
     if not education.strip() or not country.strip():
