@@ -1,6 +1,8 @@
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+import streamlit as st
+from streamlit.errors import StreamlitSecretNotFoundError
 from verified_data import VERIFIED_CAREER_DATA
 from verified_data import VERIFIED_CAREER_DATA
 
@@ -245,6 +247,12 @@ End every pathway with:
 
 def get_openai_client():
     api_key = os.getenv("NEBIUS_API_KEY")
+
+    if not api_key:
+        try:
+            api_key = st.secrets["NEBIUS_API_KEY"]
+        except (KeyError, StreamlitSecretNotFoundError):
+            api_key = None
 
     if not api_key:
         raise RuntimeError(
