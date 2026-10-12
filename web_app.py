@@ -1,5 +1,8 @@
 
+import os
+
 import streamlit as st
+from streamlit.errors import StreamlitSecretNotFoundError
 from app import ask_stepora
 
 st.set_page_config(
@@ -170,10 +173,24 @@ if build:
                 result = re.sub(r'(?<!\w)`50', '$50', result)
 
                 st.markdown(result)
-            except Exception:
+            except Exception as error:
+                error_detail = str(error)
+                api_key = os.getenv("NEBIUS_API_KEY")
+                if not api_key:
+                    try:
+                        api_key = st.secrets["NEBIUS_API_KEY"]
+                    except (KeyError, StreamlitSecretNotFoundError):
+                        api_key = None
+
+                if api_key:
+                    error_detail = error_detail.replace(api_key, "[REDACTED]")
+
                 st.error(
                     "STEPORA could not generate your pathway. "
                     "Please check the AI connection and try again."
+                )
+                st.caption(
+                    f"Diagnostic: {type(error).__name__}: {error_detail}"
                 )
 else:
     st.info("Complete the form above and select Explore My Path to see your personalized guidance.")
