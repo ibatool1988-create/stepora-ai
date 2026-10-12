@@ -217,32 +217,45 @@ Use cautious wording such as:
 "Based on the information you provided, this appears to be the
 pathway most relevant to your background."
 
-Organize the response into:
+For non-controlled cases, keep the answer concise (no more than 450
+words) and use exactly these seven headings, in this order:
 
-1. YOUR STARTING POINT
-2. WHAT ALREADY COUNTS
-3. WHAT MAY COUNT
-4. WHAT IS STILL UNKNOWN OR MISSING
-5. MOST RELEVANT PATHWAY
-6. FOREIGN CREDENTIAL REQUIREMENTS
-7. EDUCATION OR TRAINING NEEDED
-8. CERTIFICATION AND EXAMINATION
-9. NEW YORK LICENSURE
-10. PROGRAMS THAT MAY FIT
-11. ESTIMATED TIME
-12. ESTIMATED COST
-13. FINANCIAL AID
-14. CAREER AND SALARY
-15. YOUR NEXT 3 ACTIONS
-16. OFFICIAL SOURCES TO VERIFY
+1. Starting Point
+2. What May Count
+3. What Is Still Missing
+4. Most Relevant Possible Pathway
+5. Exam and Certification Cautions
+6. Next 3 Steps
+7. Official Sources
 
-Be practical and easy to understand.
+Give exactly three numbered next steps. Use only the official source URLs
+supplied in VERIFIED OFFICIAL INFORMATION. Do not add an introduction,
+conclusion, or other sections.
 
-Do not hide uncertainty. Clearly identifying something that
-needs verification is better than guessing.
+For a reported bachelor's degree in biology, say that the degree may be
+relevant to NYSED education pathway 6, which requires an acceptable
+bachelor's degree plus qualifying NAACLS-accredited MLS training or an
+acceptable advanced certificate in clinical laboratory technology.
+Do not assume the degree is acceptable, that the additional training is
+complete, or that the user must earn another MLS bachelor's degree.
+Explain that NYSED must verify which pathway and requirements apply.
 
-End every pathway with:
-"See What Counts. Know What's Next."
+State the certification and examination distinctions accurately:
+- Current ASCP MLS certification is an NYSED education alternative and
+  satisfies the examination requirement.
+- The ASCPi MLS examination is accepted when taken on or after
+  January 1, 2015, with a converted passing score of at least 75.
+- AMT MLS may satisfy a specified NYSED education alternative, but does
+  not automatically satisfy the examination requirement.
+
+Do not state or estimate program duration, timelines, credential-
+evaluation agencies or requirements, examination authorization,
+salary, financial aid, or permit eligibility unless the exact fact is
+explicitly stated in VERIFIED OFFICIAL INFORMATION. Otherwise omit these
+topics entirely. Do not say or imply the user qualifies; direct them to
+NYSED to verify final eligibility.
+
+Be practical, brief, and explicit about uncertainty.
 """
 
 def get_openai_client():
@@ -301,6 +314,46 @@ def validate_stepora_response(answer, user_message):
 
 
     return True, ""
+
+
+def validate_fallback_structure(answer):
+    """Require the general AI response to use the concise seven-section format."""
+    import re
+
+    required_sections = [
+        "Starting Point",
+        "What May Count",
+        "What Is Still Missing",
+        "Most Relevant Possible Pathway",
+        "Exam and Certification Cautions",
+        "Next 3 Steps",
+        "Official Sources",
+    ]
+    headings = []
+
+    for line in answer.splitlines():
+        heading = re.sub(r"^\s{0,3}#{1,6}\s*", "", line.strip())
+        heading = re.sub(r"^\d+[.)]\s*", "", heading).strip(" #*_:\t")
+        matching_section = next(
+            (
+                section
+                for section in required_sections
+                if heading.casefold() == section.casefold()
+            ),
+            None,
+        )
+        if matching_section:
+            headings.append(matching_section)
+        elif re.match(r"^\s{0,3}#{1,6}\s+", line):
+            headings.append(heading)
+
+    if headings != required_sections:
+        return False, "The response must contain the seven required sections in order."
+    if len(answer.split()) > 450:
+        return False, "The response must be no more than 450 words."
+
+    return True, ""
+
 
 
 
@@ -448,9 +501,7 @@ Your next steps are:
     verified_sources = VERIFIED_CAREER_DATA["clinical_laboratory_technologist"]["source_urls"]
     verified_sources_text = "\n".join(verified_sources)
 
-    response = client.chat.completions.create(
-        model="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
-        messages=[
+    messages = [
          {"role": "system", "content": SYSTEM_PROMPT},
                    {"role": "system", "content": "VERIFIED OFFICIAL INFORMATION:\n" + verified_context + "\n\nONLY APPROVED SOURCE URLS:\n" + verified_sources_text},
        {"role": "user", "content":
@@ -463,10 +514,36 @@ Your next steps are:
     "Do not claim pathway 7 is the only route. "
     "Keep ASCP MLS, ASCPi MLS, and AMT MLS rules separate and accurate."
 },
-        ],
+    ]
+
+    response = client.chat.completions.create(
+        model="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+        messages=messages,
     )
 
     answer = response.choices[0].message.content
+    structure_is_valid, _ = validate_fallback_structure(answer)
+    if not structure_is_valid:
+        retry_messages = messages + [
+            {"role": "assistant", "content": answer},
+            {
+                "role": "user",
+                "content": (
+                    "Rewrite the same answer using exactly these seven sections, "
+                    "in this order: Starting Point; What May Count; What Is Still "
+                    "Missing; Most Relevant Possible Pathway; Exam and Certification "
+                    "Cautions; Next 3 Steps; Official Sources. Keep it to 450 words "
+                    "or fewer. Do not add any new facts."
+                ),
+            },
+        ]
+        response = client.chat.completions.create(
+            model="nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+            messages=retry_messages,
+        )
+        answer = response.choices[0].message.content
+        structure_is_valid, structure_reason = validate_fallback_structure(answer)
+
     is_valid, reason = validate_stepora_response(answer, user_message)
 
     # Reliable hackathon demo pathway:
@@ -611,6 +688,12 @@ Your next steps are:
             "STEPORA could not safely verify this pathway. "
             + reason
             + "\n\nPlease review the official NYSED requirements."
+        )
+
+    if not structure_is_valid:
+        return (
+            "STEPORA could not generate the pathway in the required seven-section "
+            "format. " + structure_reason
         )
 
     return answer
