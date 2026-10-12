@@ -10,13 +10,15 @@ STEPORA AI provides personalized career-pathway guidance using verified regulato
 ## How It Works
 - User enters education background, country, career goal, location, and schedule preference.
 - Critical NYSED licensure facts come from verified pathway logic.
-- Nebius Token Factory and NVIDIA Nemotron provide personalized explanation for the AI fallback/general guidance.
+- STEPORA makes a live runtime call to NVIDIA Nemotron through Nebius Token Factory for fallback/general guidance.
+- Controlled verified pathways are used for high-stakes licensing facts.
 - STEPORA does not rely only on free-form AI for high-stakes licensure facts.
 
 ## Hackathon Demo Scope
 - Clinical Laboratory Technologist in New York
 - Controlled High School pathway
 - Controlled Bachelor's in Chemistry pathway
+- Controlled Bachelor's in Biology pathway
 - Additional careers are future expansion and are not part of the current demo scope
 
 ## Tech Stack
