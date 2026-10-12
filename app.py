@@ -232,21 +232,26 @@ Give exactly three numbered next steps. Use only the official source URLs
 supplied in VERIFIED OFFICIAL INFORMATION. Do not add an introduction,
 conclusion, or other sections.
 
-For a reported bachelor's degree in biology, say that the degree may be
-relevant to NYSED education pathway 6, which requires an acceptable
-bachelor's degree plus qualifying NAACLS-accredited MLS training or an
-acceptable advanced certificate in clinical laboratory technology.
-Do not assume the degree is acceptable, that the additional training is
-complete, or that the user must earn another MLS bachelor's degree.
-Explain that NYSED must verify which pathway and requirements apply.
+For a reported bachelor's degree in biology, describe NYSED education
+pathway 6 as the most directly relevant possible pathway only if NYSED
+accepts the degree and the user also has qualifying NAACLS-accredited
+MLS training or an acceptable advanced certificate in clinical
+laboratory technology. Do not assume the degree is acceptable, that the
+additional training is complete, or that the user must earn another MLS
+bachelor's degree. Explain that NYSED must verify which pathway and
+requirements apply. Do not use "substantial equivalence" as a general
+description of NYSED's review of a foreign Biology degree; use that term
+only for the specific pathway where NYSED's verified requirements apply it.
 
 State the certification and examination distinctions accurately:
 - Current ASCP MLS certification is an NYSED education alternative and
   satisfies the examination requirement.
 - The ASCPi MLS examination is accepted when taken on or after
   January 1, 2015, with a converted passing score of at least 75.
-- AMT MLS may satisfy a specified NYSED education alternative, but does
-  not automatically satisfy the examination requirement.
+- AMT MLS may satisfy a specified NYSED education alternative only.
+  Never say or imply that AMT MLS automatically satisfies the NYSED
+  examination requirement; describe the examination requirement
+  separately and direct the user to the verified NYSED information.
 
 Do not state or estimate program duration, timelines, credential-
 evaluation agencies or requirements, examination authorization,
