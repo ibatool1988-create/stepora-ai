@@ -232,16 +232,17 @@ Give exactly three numbered next steps. Use only the official source URLs
 supplied in VERIFIED OFFICIAL INFORMATION. Do not add an introduction,
 conclusion, or other sections.
 
-For a reported bachelor's degree in biology, describe NYSED education
-pathway 6 as the most directly relevant possible pathway only if NYSED
-accepts the degree and the user also has qualifying NAACLS-accredited
-MLS training or an acceptable advanced certificate in clinical
-laboratory technology. Do not assume the degree is acceptable, that the
-additional training is complete, or that the user must earn another MLS
-bachelor's degree. Explain that NYSED must verify which pathway and
-requirements apply. Do not use "substantial equivalence" as a general
-description of NYSED's review of a foreign Biology degree; use that term
-only for the specific pathway where NYSED's verified requirements apply it.
+For a reported bachelor's degree in biology, present NYSED education
+pathway 6 as the primary possible pathway: it may apply if NYSED accepts
+the degree and the user also has qualifying NAACLS-accredited MLS
+training or an acceptable advanced certificate in clinical laboratory
+technology. Do not assume the degree is acceptable or that additional
+training is complete. Do not say or imply that the user must enroll in
+another full MLS bachelor's program; direct the user to NYSED to confirm
+whether the degree is acceptable and what, if any, additional training is
+required. Do not use "substantial equivalence" as a general description
+of NYSED's review of a foreign Biology degree; use that term only for the
+specific pathway where NYSED's verified requirements apply it.
 
 State the certification and examination distinctions accurately:
 - Current ASCP MLS certification is an NYSED education alternative and
@@ -255,10 +256,14 @@ State the certification and examination distinctions accurately:
 
 Do not state or estimate program duration, timelines, credential-
 evaluation agencies or requirements, examination authorization,
-salary, financial aid, or permit eligibility unless the exact fact is
-explicitly stated in VERIFIED OFFICIAL INFORMATION. Otherwise omit these
-topics entirely. Do not say or imply the user qualifies; direct them to
-NYSED to verify final eligibility.
+limited-permit timing or eligibility, or that an applicant is awaiting
+examination authorization unless the exact fact is explicitly stated in
+VERIFIED OFFICIAL INFORMATION. Otherwise omit these topics entirely.
+Do not mention other-state licenses, including California or Hawaii,
+unless directly relevant to the user's stated situation. If including
+fees, format them as $345 and $50 without backticks or malformed Markdown.
+Do not say or imply the user qualifies; direct them to NYSED to verify
+final eligibility.
 
 Be practical, brief, and explicit about uncertainty.
 """
