@@ -85,7 +85,7 @@ with left:
         Discover how your education and experience
         can help you reach your career goals in New York.
         </p>
-        <p>🎓 Verify Your Credits &nbsp;&nbsp; 📍 Explore Career Pathways</p>
+        <p>🎓 See What Counts &nbsp;&nbsp; 📍 Explore Career Pathways</p>
         <p>📋 Get Personalized Next Steps</p>
     </div>
     """, unsafe_allow_html=True)
