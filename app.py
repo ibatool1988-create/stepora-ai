@@ -365,6 +365,72 @@ def validate_fallback_structure(answer):
     return True, ""
 
 
+def validate_biology_fallback_response(answer, user_message):
+    """Reject Biology fallback content that could misstate NYSED requirements."""
+    import re
+
+    normalized_user = user_message.lower().replace("’", "'")
+    is_biology_bachelor = (
+        "biology" in normalized_user
+        and re.search(r"\bbachelor(?:'s|s)?\b", normalized_user) is not None
+    )
+    if not is_biology_bachelor:
+        return True, ""
+
+    text = answer.lower().replace("’", "'")
+
+    if re.search(r"\bsubstantial(?:ly)? equivalen(?:ce|t)\b", text):
+        return False, (
+            "Do not describe a Biology degree review as substantial equivalence."
+        )
+
+    if (
+        re.search(r"\bcalifornia\b", text)
+        and not re.search(r"\bcalifornia\b", normalized_user)
+    ) or (
+        re.search(r"\bhawaii\b", text)
+        and not re.search(r"\bhawaii\b", normalized_user)
+    ):
+        return False, "Remove unrelated California or Hawaii license references."
+
+    recommends_another_bachelors = re.search(
+        r"\b(?:must|need(?:s)? to|have to|should)\b"
+        r".{0,100}\b(?:enroll|enrol|earn|complete|pursue|obtain)\b"
+        r".{0,100}\b(?:another|second|full)\b"
+        r".{0,60}\b(?:mls|medical laboratory science|medical laboratory scientist)"
+        r".{0,60}\bbachelor",
+        text,
+    )
+    if recommends_another_bachelors:
+        return False, (
+            "Do not require another full MLS bachelor's program; explain "
+            "Pathway 6 and its qualifying training options."
+        )
+
+    if re.search(
+        r"\b(?:limited permit|permit)\b.{0,100}"
+        r"\b(?:while|until|before|after|pending|awaiting|timing|timeline|"
+        r"\d+\s*(?:days?|weeks?|months?|years?))\b"
+        r"|\b(?:while|until|before|after|pending|awaiting|timing|timeline)\b"
+        r".{0,100}\b(?:limited permit|permit)\b",
+        text,
+    ):
+        return False, "Remove limited-permit timing guidance."
+
+    if re.search(
+        r"\b(?:examination|exam)\s+authori[sz]ation\b"
+        r"|\bauthori[sz]ation\s+to\s+(?:take|sit)\s+(?:the\s+)?"
+        r"(?:examination|exam)\b",
+        text,
+    ):
+        return False, "Remove examination-authorization guidance."
+
+    if re.search(r"`[^`]*(?:\$?\s*(?:345|50))[^`]*`", answer):
+        return False, "Format fees as $345 or $50 without backticks."
+
+    return True, ""
+
+
 
 
 
@@ -533,18 +599,24 @@ Your next steps are:
 
     answer = response.choices[0].message.content
     structure_is_valid, _ = validate_fallback_structure(answer)
-    if not structure_is_valid:
+    biology_is_valid, biology_reason = validate_biology_fallback_response(
+        answer, user_message
+    )
+    if not structure_is_valid or not biology_is_valid:
+        retry_instruction = (
+            "Rewrite the same answer using exactly these seven sections, "
+            "in this order: Starting Point; What May Count; What Is Still "
+            "Missing; Most Relevant Possible Pathway; Exam and Certification "
+            "Cautions; Next 3 Steps; Official Sources. Keep it to 450 words "
+            "or fewer. Do not add any new facts."
+        )
+        if not biology_is_valid:
+            retry_instruction += " Correct this issue: " + biology_reason
         retry_messages = messages + [
             {"role": "assistant", "content": answer},
             {
                 "role": "user",
-                "content": (
-                    "Rewrite the same answer using exactly these seven sections, "
-                    "in this order: Starting Point; What May Count; What Is Still "
-                    "Missing; Most Relevant Possible Pathway; Exam and Certification "
-                    "Cautions; Next 3 Steps; Official Sources. Keep it to 450 words "
-                    "or fewer. Do not add any new facts."
-                ),
+                "content": retry_instruction,
             },
         ]
         response = client.chat.completions.create(
@@ -553,6 +625,9 @@ Your next steps are:
         )
         answer = response.choices[0].message.content
         structure_is_valid, structure_reason = validate_fallback_structure(answer)
+        biology_is_valid, biology_reason = validate_biology_fallback_response(
+            answer, user_message
+        )
 
     is_valid, reason = validate_stepora_response(answer, user_message)
 
@@ -698,6 +773,14 @@ Your next steps are:
             "STEPORA could not safely verify this pathway. "
             + reason
             + "\n\nPlease review the official NYSED requirements."
+        )
+
+    if not biology_is_valid:
+        return (
+            "STEPORA could not safely verify this Biology pathway. Please confirm "
+            "the applicable education pathway and requirements directly with "
+            "NYSED using these official sources:\n"
+            + "\n".join(verified_sources)
         )
 
     if not structure_is_valid:
