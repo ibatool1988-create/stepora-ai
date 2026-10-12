@@ -772,31 +772,29 @@ Your next steps are:
     is_biology_bachelor = (
         "biology" in normalized_user and "bachelor" in normalized_user
     )
-    if is_biology_bachelor and (
-        not is_valid or not biology_is_valid or not structure_is_valid
-    ):
+    if is_biology_bachelor:
         return """
-## 1. Starting Point
+## Starting Point
 A bachelor's degree in Biology alone does not automatically satisfy New York State Education Department (NYSED) Clinical Laboratory Technologist requirements. NYSED must determine whether your foreign degree is acceptable.
 
-## 2. What May Count
+## What May Count
 Your Biology degree may be relevant to an education pathway when accepted by NYSED. Current ASCP MLS certification is an NYSED education alternative and satisfies the examination requirement. AMT MLS may satisfy an education alternative, but does not automatically satisfy the examination requirement.
 
-## 3. What Is Still Missing
+## What Is Still Missing
 Ask NYSED whether it accepts your degree and what additional clinical laboratory training, if any, is required. Do not assume the degree is acceptable or that another full bachelor's degree is required.
 
-## 4. Most Relevant Possible Pathway
+## Most Relevant Possible Pathway
 NYSED Pathway 6 may be relevant if NYSED accepts your bachelor's degree and you also have qualifying NAACLS-accredited MLS training or an acceptable advanced certificate in clinical laboratory technology.
 
-## 5. Exam and Certification Cautions
+## Exam and Certification Cautions
 A qualifying ASCPi MLS examination must have been taken on or after January 1, 2015, with a converted passing score of at least 75. Confirm applicable examination requirements with NYSED.
 
-## 6. Next 3 Steps
+## Next 3 Steps
 1. Contact NYSED to confirm whether your Biology degree is acceptable.
 2. Ask NYSED what qualifying additional training is required, if any.
 3. Confirm how your certification or examination applies to your pathway.
 
-## 7. Official Sources
+## Official Sources
 - https://www.op.nysed.gov/professions/clinical-laboratory-technologists/full-license-requirements
 - https://www.op.nysed.gov/professions/clinical-laboratory-technologists/full-license-application-forms
 """
@@ -806,14 +804,6 @@ A qualifying ASCPi MLS examination must have been taken on or after January 1, 2
             "STEPORA could not safely verify this pathway. "
             + reason
             + "\n\nPlease review the official NYSED requirements."
-        )
-
-    if not biology_is_valid:
-        return (
-            "STEPORA could not safely verify this Biology pathway. Please confirm "
-            "the applicable education pathway and requirements directly with "
-            "NYSED using these official sources:\n"
-            + "\n".join(verified_sources)
         )
 
     if not structure_is_valid:
